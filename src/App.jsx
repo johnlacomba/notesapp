@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { Chessboard } from "react-chessboard";
+import './App.css'
 
-export default function App() {
-	  return (
-		      <div>
-		        <Chessboard id="BasicBoard" />
-		      </div>
-		    );
+function App() {
+    return (
+        <div>
+            <Chessboard id="BasicBoard" />
+        </div>
+    );
 }
+export default App
