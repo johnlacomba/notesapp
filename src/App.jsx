@@ -2,7 +2,7 @@ import { useState } from "react";
 import Chess from "chess.js";
 import { Chessboard } from "react-chessboard";
 
-export default function PlayRandomMoveEngine() {
+export function PlayRandomMoveEngine() {
 	  const [game, setGame] = useState(new Chess());
 
 	  function makeAMove(move) {
