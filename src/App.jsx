@@ -1,3 +1,4 @@
+import react;
 import { Chessboard } from "react-chessboard";
 
 function App() {
