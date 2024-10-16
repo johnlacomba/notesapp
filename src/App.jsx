@@ -1,27 +1,24 @@
 import { useState } from "react";
-import Chess from "chess.js";
+import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
 
-export default function PlayRandomMoveEngine() {
+export default function Board() {
   const [game, setGame] = useState(new Chess());
 
-  function makeAMove(move) {
-    const gameCopy = { ...game };
-    const result = gameCopy.move(move);
-    setGame(gameCopy);
-    return result; // null if the move was illegal, the move object if the move was legal
+  const makeMove = (move) => {
+    game.move(move)
+    setGame(new Chess(game.fen()))
   }
 
   function makeRandomMove() {
     const possibleMoves = game.moves();
-    if (game.game_over() || game.in_draw() || possibleMoves.length === 0)
-      return; // exit if the game is over
+    if (game.isGameOver() || game.isDraw() || possibleMoves.length === 0) return; // exit if the game is over
     const randomIndex = Math.floor(Math.random() * possibleMoves.length);
-    makeAMove(possibleMoves[randomIndex]);
+    makeMove(possibleMoves[randomIndex]);
   }
 
   function onDrop(sourceSquare, targetSquare) {
-    const move = makeAMove({
+    const move = makeMove({
       from: sourceSquare,
       to: targetSquare,
       promotion: "q", // always promote to a queen for example simplicity
@@ -33,5 +30,9 @@ export default function PlayRandomMoveEngine() {
     return true;
   }
 
-  return <Chessboard position={game.fen()} onPieceDrop={onDrop} />;
+  return(
+     <div>
+        <Chessboard position={game.fen()} onPieceDrop={onDrop} />
+     </div>
+  )
 }
