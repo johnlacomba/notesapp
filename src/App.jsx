@@ -1,6 +1,4 @@
-import { useState } from "react";
 import { Chessboard } from "react-chessboard";
-import './App.css'
 
 function App() {
     return (
@@ -9,4 +7,4 @@ function App() {
         </div>
     );
 }
-export default App
+export default App;
