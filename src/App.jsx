@@ -1,4 +1,4 @@
-import react;
+import React from 'react';
 import { Chessboard } from "react-chessboard";
 
 function App() {
