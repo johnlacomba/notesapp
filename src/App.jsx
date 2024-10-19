@@ -16,8 +16,8 @@ export default function Board() {
   const [game, setGame] = useState(new Chess());
 
   const makeMove = (move) => {
-    game.move(move)
-    setGame(new Chess(game.fen()))
+    game.move(move);
+    setGame(new Chess(game.fen()));
   }
 
   function makeRandomMove() {
@@ -48,11 +48,13 @@ export default function Board() {
     }} />
        <button style={buttonStyle} onClick={() => {
          game.reset();
+         setGame(new Chess(game.fen()));
     }}>
          reset
        </button>
        <button style={buttonStyle} onClick={() => {
          game.undo();
+         setGame(new Chess(game.fen()));
     }}>
          undo
        </button>
