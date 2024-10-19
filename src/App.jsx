@@ -5,6 +5,24 @@ import { Chessboard } from "react-chessboard";
 export default function Board() {
   const [game, setGame] = useState(new Chess());
 
+  const buttonStyle = {
+    cursor: "pointer",
+    padding: "10px 20px",
+    margin: "10px 10px 0px 0px",
+    borderRadius: "6px",
+    backgroundColor: "#f0d9b5",
+    border: "none",
+    boxShadow: "0 2px 5px rgba(0, 0, 0, 0.5)",
+  };
+
+  function safeGameMutate(modify) {
+    setGame((g) => {
+      const update = { ...g };
+      modify(update);
+      return update;
+    });
+  }
+  
   const makeMove = (move) => {
     game.move(move)
     setGame(new Chess(game.fen()))
