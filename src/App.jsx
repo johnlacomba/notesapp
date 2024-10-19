@@ -1,93 +1,51 @@
-import React, { forwardRef, useEffect, useRef, useState, useMemo } from "react";
+import { useState } from "react";
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
 
-const buttonStyle = {
-  cursor: "pointer",
-  padding: "10px 20px",
-  margin: "10px 10px 0px 0px",
-  borderRadius: "6px",
-  backgroundColor: "#f0d9b5",
-  border: "none",
-  boxShadow: "0 2px 5px rgba(0, 0, 0, 0.5)",
-};
-
 export default function Board() {
   const [game, setGame] = useState(new Chess());
-  const [currentTimeout, setCurrentTimeout] = useState<NodeJS.Timeout>();
 
-  function safeGameMutate(modify) {
-    setGame((g) => {
-      const update = { ...g };
-      modify(update);
-      return update;
-    });
+  const makeMove = (move) => {
+    game.move(move)
+    setGame(new Chess(game.fen()))
   }
 
   function makeRandomMove() {
     const possibleMoves = game.moves();
-
-    // exit if the game is over
-    if (game.game_over() || game.in_draw() || possibleMoves.length === 0)
-      return;
-
+    if (game.isGameOver() || game.isDraw() || possibleMoves.length === 0) return; // exit if the game is over
     const randomIndex = Math.floor(Math.random() * possibleMoves.length);
-    safeGameMutate((game) => {
-      game.move(possibleMoves[randomIndex]);
-    });
+    makeMove(possibleMoves[randomIndex]);
   }
 
-  function onDrop(sourceSquare, targetSquare, piece) {
-    const gameCopy = { ...game };
-    const move = gameCopy.move({
+  function onDrop(sourceSquare, targetSquare) {
+    const move = makeMove({
       from: sourceSquare,
       to: targetSquare,
-      promotion: piece[1].toLowerCase() ?? "q",
+      promotion: "q", // always promote to a queen for example simplicity
     });
-    setGame(gameCopy);
 
     // illegal move
     if (move === null) return false;
-
-    // store timeout so it can be cleared on undo/reset so computer doesn't execute move
-    const newTimeout = setTimeout(makeRandomMove, 200);
-    setCurrentTimeout(newTimeout);
+    setTimeout(makeRandomMove, 200);
     return true;
   }
 
-  return (
-    <div style={boardWrapper}>
-      <Chessboard
-        id="PlayVsRandom"
-        position={game.fen()}
-        onPieceDrop={onDrop}
-        customBoardStyle={{
-          borderRadius: "4px",
-          boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
-        }}
-      />
-      <button
-        style={buttonStyle}
-        onClick={() => {
-          safeGameMutate((game) => {
-            game.reset();
-          });
-          clearTimeout(currentTimeout);
-        }}
-      >
-        reset
-      </button>
-      <button
-        style={buttonStyle}
-        onClick={() => {
-          safeGameMutate((game) => {
-            game.undo();
-          });
-          clearTimeout(currentTimeout);
-        }}
-      >
-        undo
-      </button>
-    </div>
-  );
-};
+  return(
+     <div>
+       <Chessboard position={game.fen()} onPieceDrop={onDrop} customBoardStyle={{
+       borderRadius: "4px",
+       boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)"
+    }} />
+       <button style={buttonStyle} onClick={() => {
+         game.reset();
+    }}>
+         reset
+       </button>
+       <button style={buttonStyle} onClick={() => {
+         game.undo();
+    }}>
+         undo
+       </button>
+     </div>
+  )
+}
