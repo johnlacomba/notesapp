@@ -4,7 +4,7 @@ import { Chessboard } from "react-chessboard";
 
 export default function Board() {
   const [game, setGame] = useState(new Chess());
-  const [currentTimeout, setCurrentTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [currentTimeout, setCurrentTimeout] = useState<NodeJS.Timeout | undefined>();
   function safeGameMutate(modify) {
     setGame(g => {
       const update = {
