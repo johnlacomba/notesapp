@@ -40,6 +40,13 @@ export default function Board() {
     return true;
   }
 
+const handleUndo = () => {
+    const newGame = new Chess(game.fen());
+    newGame.undo();
+    setGame(newGame);
+    setFen(newGame.fen());
+  };
+  
   return(
      <div>
        <Chessboard position={game.fen()} onPieceDrop={onDrop} customBoardStyle={{
@@ -52,10 +59,7 @@ export default function Board() {
     }}>
          reset
        </button>
-       <button style={buttonStyle} onClick={() => {
-         game.undo();
-         setGame(new Chess(game.fen()));
-    }}>
+       <button style={buttonStyle} onClick={handleUndo}>
          undo
        </button>
      </div>
