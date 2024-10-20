@@ -43,8 +43,7 @@ export default function Board() {
 const handleUndo = () => {
     const newGame = new Chess(game.fen());
     newGame.undo();
-    setGame(newGame);
-    setFen(newGame.fen());
+    setGame(newGame.fen());
   };
   
   return(
