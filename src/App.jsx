@@ -14,6 +14,7 @@ const buttonStyle = {
 
 export default function Board() {
   const [game, setGame] = useState(new Chess());
+  const [history, setHistory] = useState([]);
   
   const makeMove = (move) => {
     game.move(move);
@@ -27,29 +28,36 @@ export default function Board() {
     makeMove(possibleMoves[randomIndex]);
   }
 
-  function onDrop(sourceSquare, targetSquare) {
-    const move = makeMove({
+  const onDrop = (sourceSquare, targetSquare) => {
+    const move = game.move({
       from: sourceSquare,
       to: targetSquare,
-      promotion: "q", // always promote to a queen for example simplicity
+      promotion: 'q' // Promote to a queen if possible
     });
 
-    // illegal move
-    if (move === null) return false;
-    setTimeout(makeRandomMove, 200);
-    return true;
-  }
+    if (move) {
+      setGame(game);
+      setHistory([...history, game.fen()]);
+    }
+  };
 
-  function handleUndo() {
-    game.undo();
-    game.fen();
-  }
+  const handleUndo = () => {
+    if (history.length > 0) {
+      const newHistory = history.slice(0, -1);
+      const lastFen = newHistory[newHistory.length - 1];
+      setHistory(newHistory);
+      setGame(new Chess(lastFen)); 
+    }
+  };
   
   return(
      <div>
-       <Chessboard position={game.fen()} onPieceDrop={onDrop} customBoardStyle={{
-       borderRadius: "4px",
-       boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)"
+       <Chessboard 
+         position={game.fen()} 
+         onPieceDrop={onDrop} 
+         customBoardStyle={{
+           borderRadius: "4px",
+           boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)"
     }} />
        <button style={buttonStyle} onClick={() => {
          game.reset();
