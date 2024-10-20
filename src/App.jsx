@@ -26,7 +26,6 @@ export default function Board() {
     if (game.isGameOver() || game.isDraw() || possibleMoves.length === 0) return; // exit if the game is over
     const randomIndex = Math.floor(Math.random() * possibleMoves.length);
     makeMove(possibleMoves[randomIndex]);
-    setHistory([...history, game.fen()]);
   }
 
   const onDrop = (sourceSquare, targetSquare) => {
