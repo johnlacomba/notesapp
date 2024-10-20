@@ -15,18 +15,20 @@ const buttonStyle = {
 export default function Board() {
   const [game, setGame] = useState(new Chess());
   const [history, setHistory] = useState([]);
-  
+
   const makeMove = (move) => {
     game.move(move);
     setGame(new Chess(game.fen()));
-  }
+  };
 
   function makeRandomMove() {
     const possibleMoves = game.moves();
     if (game.isGameOver() || game.isDraw() || possibleMoves.length === 0) return; // exit if the game is over
     const randomIndex = Math.floor(Math.random() * possibleMoves.length);
-    makeMove(possibleMoves[randomIndex]);
-    setHistory([...history, game.fen()]);
+    const randomMove = possibleMoves[randomIndex];
+
+    makeMove(randomMove);
+    setHistory([...history, randomMove]); // Store the move instead of the FEN
   }
 
   const onDrop = (sourceSquare, targetSquare) => {
@@ -38,38 +40,39 @@ export default function Board() {
 
     if (move) {
       setGame(game);
-      setHistory([...history, game.fen()]);
+      setHistory([...history, move.san]); // Store the move in SAN format
       setTimeout(makeRandomMove, 200);
     }
   };
 
   const handleUndo = () => {
     if (history.length > 0) {
-      const newHistory = history.slice(0, -1);
-      const lastFen = newHistory[newHistory.length - 1];
-      setHistory(newHistory);
-      setGame(new Chess(lastFen)); 
+      game.undo(); // Undo the last move
+      setHistory(history.slice(0, -1)); // Remove the last move from history
+      setGame(new Chess(game.fen())); // Update the game state
     }
   };
-  
-  return(
-     <div>
-       <Chessboard 
-         position={game.fen()} 
-         onPieceDrop={onDrop} 
-         customBoardStyle={{
-           borderRadius: "4px",
-           boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)"
-    }} />
-       <button style={buttonStyle} onClick={() => {
-         game.reset();
-         setGame(new Chess(game.fen()));
-    }}>
-         reset
-       </button>
-       <button style={buttonStyle} onClick={handleUndo}>
-         undo
-       </button>
-     </div>
-  )
+
+  return (
+    <div>
+      <Chessboard 
+        position={game.fen()} 
+        onPieceDrop={onDrop} 
+        customBoardStyle={{
+          borderRadius: "4px",
+          boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)"
+        }} 
+      />
+      <button style={buttonStyle} onClick={() => {
+        game.reset();
+        setGame(new Chess(game.fen()));
+        setHistory([]); // Clear history on reset
+      }}>
+        reset
+      </button>
+      <button style={buttonStyle} onClick={handleUndo}>
+        undo
+      </button>
+    </div>
+  );
 }
