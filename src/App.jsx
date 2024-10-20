@@ -14,7 +14,8 @@ const buttonStyle = {
 
 export default function Board() {
   const [game, setGame] = useState(new Chess());
-
+  var future = [];
+  
   const makeMove = (move) => {
     game.move(move);
     setGame(new Chess(game.fen()));
@@ -40,11 +41,22 @@ export default function Board() {
     return true;
   }
 
-const handleUndo = () => {
-    const newGame = new Chess(game.fen());
-    newGame.undo();
-    setGame(newGame.fen());
-  };
+  function handleUndo() {
+    var moves = this.history();
+    var tmp = new Chess();
+    var previous = moves.length-future.length-1;
+    for(var i=0;i<previous;i++) {
+      tmp.move(moves[i]);
+    }
+    var previous_fen = tmp.fen();
+    tmp.move(moves[previous]);
+    future.push(tmp.fen());
+    return previous_fen;
+  }
+
+  function handleRedo() {
+    return future.pop();
+  }
   
   return(
      <div>
