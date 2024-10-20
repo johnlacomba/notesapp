@@ -42,11 +42,7 @@ export default function Board() {
 
   function handleUndo() {
     game.undo();
-    setGame(new Chess(game.fen()));
-  }
-
-  function handleRedo() {
-    return future.pop();
+    game.fen();
   }
   
   return(
