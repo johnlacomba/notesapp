@@ -6,7 +6,7 @@ import './App.css';
 const buttonStyle = {
   cursor: "pointer",
   padding: "10px 20px",
-  margin: "10px 10px 0px 0px",
+  margin: "10px 0", // Add vertical margin
   borderRadius: "6px",
   backgroundColor: "#f0d9b5",
   border: "none",
@@ -20,7 +20,7 @@ export default function Board() {
   const [history, setHistory] = useState([]);
   const [boardSize, setBoardSize] = useState(Math.min(window.innerWidth, window.innerHeight));
 
-  // Handle dynamically resizing the board
+  // Handle resizing the board dynamically
   useEffect(() => {
     const updateBoardSize = () => {
       const size = Math.min(window.innerWidth, window.innerHeight);
@@ -95,29 +95,33 @@ export default function Board() {
   };
 
   return (
-    <div id="chessboard-container">
-      <Chessboard
-        position={game.fen()}
-        onPieceDrop={onDrop}
-        animationDuration={200} // Smooth animation
-        customBoardStyle={{
-          borderRadius: "4px",
-          boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
-        }}
-      />
-      <button
-        style={buttonStyle}
-        onClick={() => {
-          gameRef.current.reset();
-          setHistory([]);
-          updateGameState();
-        }}
-      >
-        reset
-      </button>
-      <button style={buttonStyle} onClick={handleUndo}>
-        undo
-      </button>
+    <div id="chessboard-wrapper">
+      <div id="chessboard-container">
+        <Chessboard
+          position={game.fen()}
+          onPieceDrop={onDrop}
+          animationDuration={200}
+          customBoardStyle={{
+            borderRadius: "4px",
+            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+          }}
+        />
+      </div>
+      <div id="buttons-container">
+        <button
+          style={buttonStyle}
+          onClick={() => {
+            gameRef.current.reset();
+            setHistory([]);
+            updateGameState();
+          }}
+        >
+          reset
+        </button>
+        <button style={buttonStyle} onClick={handleUndo}>
+          undo
+        </button>
+      </div>
     </div>
   );
 }
