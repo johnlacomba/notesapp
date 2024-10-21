@@ -20,9 +20,7 @@ export default function Board() {
 
   // Initialize Stockfish using a CDN when the component mounts
   useEffect(() => {
-    stockfishRef.current = new Worker(
-      new URL("https://cdn.jsdelivr.net/gh/niklasf/stockfish.wasm/stockfish.js", import.meta.url)
-    );
+    stockfishRef.current = new Worker("./stockfish.js");
     return () => stockfishRef.current.terminate(); // Clean up on unmount
   }, []);
 
