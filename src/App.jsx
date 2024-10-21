@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
+import './App.css';
 
 const buttonStyle = {
   cursor: "pointer",
@@ -17,8 +18,24 @@ export default function Board() {
   const stockfishRef = useRef(null); // Stockfish worker reference
   const [game, setGame] = useState(new Chess());
   const [history, setHistory] = useState([]);
+  const [boardSize, setBoardSize] = useState(Math.min(window.innerWidth, window.innerHeight));
 
-  // Initialize Stockfish using a CDN when the component mounts
+  // Handle dynamically resizing the board
+  useEffect(() => {
+    const updateBoardSize = () => {
+      const size = Math.min(window.innerWidth, window.innerHeight);
+      setBoardSize(size);
+      document.documentElement.style.setProperty("--board-size", `${size}px`);
+    };
+
+    // Update size on load and whenever the window is resized
+    window.addEventListener("resize", updateBoardSize);
+    updateBoardSize();
+
+    return () => window.removeEventListener("resize", updateBoardSize);
+  }, []);
+  
+  // Initialize Stockfish using a local instance when the component mounts
   useEffect(() => {
     stockfishRef.current = new Worker("./stockfish.js");
     return () => stockfishRef.current.terminate(); // Clean up on unmount
@@ -78,7 +95,7 @@ export default function Board() {
   };
 
   return (
-    <div>
+    <div id="chessboard-container">
       <Chessboard
         position={game.fen()}
         onPieceDrop={onDrop}
