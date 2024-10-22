@@ -2,6 +2,29 @@ import { useState, useRef, useEffect } from "react";
 import { Chess } from "chess.js";
 import { Chessboard } from "react-chessboard";
 import './App.css';
+import {
+  Authenticator,
+  Button,
+  Text,
+  TextField,
+  Heading,
+  Flex,
+  View,
+  Image,
+  Grid,
+  Divider,
+} from "@aws-amplify/ui-react";
+import { Amplify } from "aws-amplify";
+import "@aws-amplify/ui-react/styles.css";
+import { getUrl } from "aws-amplify/storage";
+import { uploadData } from "aws-amplify/storage";
+import { generateClient } from "aws-amplify/data";
+import outputs from "../amplify_outputs.json";
+
+Amplify.configure(outputs);
+const client = generateClient({
+  authMode: "userPool",
+});
 
 const buttonStyle = {
   cursor: "pointer",
@@ -95,33 +118,50 @@ export default function Board() {
   };
 
   return (
-    <div id="chessboard-wrapper">
-      <div id="chessboard-container">
-        <Chessboard
-          position={game.fen()}
-          onPieceDrop={onDrop}
-          animationDuration={200}
-          customBoardStyle={{
-            borderRadius: "4px",
-            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
-          }}
-        />
-      </div>
-      <div id="buttons-container">
-        <button
-          style={buttonStyle}
-          onClick={() => {
-            gameRef.current.reset();
-            setHistory([]);
-            updateGameState();
-          }}
+    <Authenticator>
+      {({ signOut }) => (
+        <Flex
+          className="App"
+          justifyContent="center"
+          alignItems="center"
+          direction="column"
+          width="70%"
+          margin="0 auto"
         >
-          reset
-        </button>
-        <button style={buttonStyle} onClick={handleUndo}>
-          undo
-        </button>
-      </div>
-    </div>
+          <Heading level={1}>My Notes App</Heading>
+          <View>
+						<div id="chessboard-wrapper">
+						  <div id="chessboard-container">
+							<Chessboard
+							  position={game.fen()}
+							  onPieceDrop={onDrop}
+							  animationDuration={200}
+							  customBoardStyle={{
+								borderRadius: "4px",
+								boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+							  }}
+							/>
+						  </div>
+						  <div id="buttons-container">
+							<button
+							  style={buttonStyle}
+							  onClick={() => {
+								gameRef.current.reset();
+								setHistory([]);
+								updateGameState();
+							  }}
+							>
+							  reset
+							</button>
+							<button style={buttonStyle} onClick={handleUndo}>
+							  undo
+							</button>
+						  </div>
+						</div>
+          </View>
+            <Button onClick={signOut}>Sign Out</Button>
+        </Flex>
+      )}
+      </Authenticator>
   );
 }
