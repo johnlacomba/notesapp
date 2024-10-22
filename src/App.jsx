@@ -43,6 +43,51 @@ export default function Board() {
   const [history, setHistory] = useState([]);
   const [boardSize, setBoardSize] = useState(Math.min(window.innerWidth, window.innerHeight));
 
+  useEffect(() => {
+    fetchNotes();  // Remember to rename all of these "note" references
+  }, []);
+
+  async function fetchNotes() {
+    const { data: game } = await client.models.Note.list();
+    await Promise.all(
+      game.map(async (note) => {
+        if (note.description) {
+          const linkToStorageFile = await getUrl({
+            path: ({ identityId }) => `media/${identityId}/${note.description}`,
+          });
+          console.log(linkToStorageFile.url);
+          note.description = linkToStorageFile.url;
+        }
+        return note;
+      })
+    );
+    console.log(game);
+    setGame(game);
+    updateGameState();  // Might not be needed
+   }
+
+  async function createNote(event) {
+    event.preventDefault();
+    const form = new FormData(event.target);
+    console.log(gameRef.current.fen());
+
+    const { data: newNote } = await client.models.Note.create({
+      description: gameRef.current.fen(),
+    });
+    
+    console.log(newNote);
+    if (newNote.description)
+      if (newNote.description)
+        await uploadData({
+          path: ({ identityId }) => `media/${identityId}/${newNote.description}`,
+
+          data: gameRef.current.fen(),
+        }).result;
+
+    fetchNotes();
+    event.target.reset();
+  }
+  
   // Handle resizing the board dynamically
   useEffect(() => {
     const updateBoardSize = () => {
