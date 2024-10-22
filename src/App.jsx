@@ -128,7 +128,6 @@ export default function Board() {
           width="70%"
           margin="0 auto"
         >
-          <Heading level={1}>Chaos Chess</Heading>
           <View>
             <div id="chessboard-wrapper">
               <div id="chessboard-container">
