@@ -128,36 +128,36 @@ export default function Board() {
           width="70%"
           margin="0 auto"
         >
-          <Heading level={1}>My Notes App</Heading>
+          <Heading level={1}>Chaos Chess</Heading>
           <View>
-						<div id="chessboard-wrapper">
-						  <div id="chessboard-container">
-							<Chessboard
-							  position={game.fen()}
-							  onPieceDrop={onDrop}
-							  animationDuration={200}
-							  customBoardStyle={{
-								borderRadius: "4px",
-								boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
-							  }}
-							/>
-						  </div>
-						  <div id="buttons-container">
-							<button
-							  style={buttonStyle}
-							  onClick={() => {
-								gameRef.current.reset();
-								setHistory([]);
-								updateGameState();
-							  }}
-							>
-							  reset
-							</button>
-							<button style={buttonStyle} onClick={handleUndo}>
-							  undo
-							</button>
-						  </div>
-						</div>
+            <div id="chessboard-wrapper">
+              <div id="chessboard-container">
+                <Chessboard
+                  position={game.fen()}
+                  onPieceDrop={onDrop}
+                  animationDuration={200}
+                  customBoardStyle={{
+                    borderRadius: "4px",
+                    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+                  }}
+                />
+              </div>
+              <div id="buttons-container">
+                <button
+                  style={buttonStyle}
+                  onClick={() => {
+                    gameRef.current.reset();
+                    setHistory([]);
+                    updateGameState();
+                  }}
+                >
+                  reset
+                </button>
+                <button style={buttonStyle} onClick={handleUndo}>
+                  undo
+                </button>
+              </div>
+            </div>
           </View>
             <Button onClick={signOut}>Sign Out</Button>
         </Flex>
