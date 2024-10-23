@@ -53,7 +53,7 @@ export default function Board() {
       game.map(async (note) => {
         if (note.description) {
           const linkToStorageFile = await getUrl({
-            path: ({ identityId }) => `media/${identityId}/${note.description}`,
+            path: ({ identityId }) => `media/${identityId}/boardstate`,
           });
           console.log(gameRef.current.fen());
           note.description = gameRef.current.fen();
