@@ -42,7 +42,6 @@ export default function Board() {
   const [game, setGame] = useState(new Chess());
   const [history, setHistory] = useState([]);
   const [boardSize, setBoardSize] = useState(Math.min(window.innerWidth, window.innerHeight));
-  const username = user.username;
 
   useEffect(() => {
     getUserInfo();
