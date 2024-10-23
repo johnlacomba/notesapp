@@ -20,7 +20,7 @@ import { getUrl } from "aws-amplify/storage";
 import { uploadData } from "aws-amplify/storage";
 import { generateClient } from "aws-amplify/data";
 import outputs from "../amplify_outputs.json";
-import { Auth } from "@aws-amplify/auth";
+import { fetchUserAttributes } from 'aws-amplify/auth';
 
 Amplify.configure(outputs);
 const client = generateClient({
@@ -50,7 +50,7 @@ export default function Board() {
   }, []);
 
   async function getUserInfo() {
-    const user = await Auth.currentAuthenticatedUser();
+    const user = await fetchUserAttributes();
     const username = user.username;
   }
   
