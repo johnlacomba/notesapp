@@ -40,15 +40,29 @@ const buttonStyle = {
 export default function Board() {
   const gameRef = useRef(new Chess()); // Stable game instance
   const stockfishRef = useRef(null); // Stockfish worker reference
+  const [username, setUsername] = useState(null); // Current user's username
   const [game, setGame] = useState(new Chess());
   const [history, setHistory] = useState([]);
   const [boardSize, setBoardSize] = useState(Math.min(window.innerWidth, window.innerHeight));
 
+  // Fetch the user info on component mount
   useEffect(() => {
-    const username = getUserInfo();
-    console.log("getUserInfo3: ", username);
+    const fetchUser = async () => {
+      const user = await getUserInfo();
+      console.log("getUserInfo3: ", user);
+      setUsername(user); // Set the username once fetched
+    };
+
+    fetchUser();
   }, []);
 
+  // Fetch notes when the username is available
+  useEffect(() => {
+    if (username) { // Ensure username is available
+      fetchNotes(username); // Pass the username to fetchNotes
+    }
+  }, [username]); // Run when 'username' state changes
+  
   async function getUserInfo() {
     const user = await fetchUserAttributes();
     console.log("getUserInfo1: ", user);
@@ -61,25 +75,11 @@ export default function Board() {
     fetchNotes();  // Remember to rename all of these "note" references
   }, []);
   
-  async function fetchNotes() {
-    //const { data: game, errors } = await client.models.Note.get({
-    //  id: '...',
-    //});
+  async function fetchNotes(username) {
     const { data: game } = await client.models.Note.list({
       gameRoom: { eq: username }, // Find game room with matching username 
     });
-    //await Promise.all(
-    //  game.map(async (note) => {
-    //    if (note.description) {
-    //      const linkToStorageFile = await getUrl({
-    //        path: ({ identityId }) => `media/${identityId}/boardstate`,
-    //      });
-    //      console.log("fetchNotes1: ", gameRef.current.fen());
-    //      note.description = gameRef.current.fen();
-    //    }
-    //    return note;
-    //  })
-    //);
+
     if (game[0].length > 0) {
       console.log("fetchNotes2: ", game[0]);
       setGame(game[0].description);
