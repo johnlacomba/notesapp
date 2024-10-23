@@ -48,6 +48,10 @@ export default function Board() {
   }, []);
 
   async function fetchNotes() {
+    //const { data: game, errors } = await client.models.Note.get({
+    //  id: '...',
+    //});
+    console.log("Debug1: ", client);  // Debug
     const { data: game } = await client.models.Note.list();
     //await Promise.all(
     //  game.map(async (note) => {
