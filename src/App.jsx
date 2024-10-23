@@ -46,12 +46,14 @@ export default function Board() {
 
   useEffect(() => {
     const username = getUserInfo();
+    console.log("getUserInfo3: ", username);
   }, []);
 
   async function getUserInfo() {
     const user = await fetchUserAttributes();
     console.log("getUserInfo1: ", user);
     const username = user.email;
+    console.log("getUserInfo2: ", username);
     return username;
   }
   
