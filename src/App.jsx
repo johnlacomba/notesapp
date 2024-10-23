@@ -42,20 +42,27 @@ export default function Board() {
   const [game, setGame] = useState(new Chess());
   const [history, setHistory] = useState([]);
   const [boardSize, setBoardSize] = useState(Math.min(window.innerWidth, window.innerHeight));
-  const user = await Auth.currentAuthenticatedUser();
   const username = user.username;
-  
+
   useEffect(() => {
+    getUserInfo();
     fetchNotes();  // Remember to rename all of these "note" references
   }, []);
 
+  async function getUserInfo() {
+    const user = await Auth.currentAuthenticatedUser();
+    const username = user.username;
+  }
+  
   async function fetchNotes() {
     //const { data: game, errors } = await client.models.Note.get({
     //  id: '...',
     //});
     
     console.log("Debug1: ", username);  // Debug
-    const { data: game } = await client.models.Note.list();
+    const { data: game } = await client.models.Note.list({
+      gameRoom: { eq: username }, // Find game room with matching username 
+    });
     //await Promise.all(
     //  game.map(async (note) => {
     //    if (note.description) {
@@ -73,6 +80,35 @@ export default function Board() {
     updateGameState();  // Might not be needed
    }
 
+  const updateGameRoomDescription = async () => {
+    try {
+      // Step 1: Query the existing game room by username
+      const { data: existingGameRoom } = await client.models.Note.list({
+        gameRoom: { eq: username }, // Find game room with matching username
+      });
+
+      if (existingGameRoom.length > 0) {
+        const gameRoom = existingGameRoom[0]; // Get the first matching game room
+
+        // Step 2: Update the description field with the new FEN state
+        const { data: updatedGameRoom } = await client.models.Note.update({
+          id: gameRoom.id, // Use the ID of the existing game room
+          description: gameRef.current.fen(), // Update the description
+        });
+
+        console.log("Game room updated:", updatedGameRoom);
+      } else {
+        // Create a new game room entry
+        const { data: newGameRoom } = await client.models.Note.create({
+          gameRoom: username,
+          description: gameRef.current.fen(),
+        });
+      }
+    } catch (error) {
+      console.error("Error updating game room:", error);
+    }
+  };
+  
   async function createNote() {
     console.log("createNote1: ", gameRef.current.fen());
 
@@ -133,7 +169,7 @@ export default function Board() {
     if (move) {
       setHistory([...history, move.san]);
       updateGameState();
-      createNote();
+      updateGameRoomDescription();
       setTimeout(makeStockfishMove, 500); // Delay before Stockfish responds
     }
   };
@@ -155,7 +191,7 @@ export default function Board() {
 
         gameRef.current.move({ from, to });
         updateGameState();
-        createNote();
+        updateGameRoomDescription();
       }
     };
   };
