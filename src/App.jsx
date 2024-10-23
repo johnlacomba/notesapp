@@ -42,7 +42,9 @@ export default function Board() {
   const [game, setGame] = useState(new Chess());
   const [history, setHistory] = useState([]);
   const [boardSize, setBoardSize] = useState(Math.min(window.innerWidth, window.innerHeight));
-
+  const user = await Auth.currentAuthenticatedUser();
+  const username = user.username;
+  
   useEffect(() => {
     fetchNotes();  // Remember to rename all of these "note" references
   }, []);
@@ -51,7 +53,8 @@ export default function Board() {
     //const { data: game, errors } = await client.models.Note.get({
     //  id: '...',
     //});
-    console.log("Debug1: ", client);  // Debug
+    
+    console.log("Debug1: ", username);  // Debug
     const { data: game } = await client.models.Note.list();
     //await Promise.all(
     //  game.map(async (note) => {
@@ -74,7 +77,7 @@ export default function Board() {
     console.log("createNote1: ", gameRef.current.fen());
 
     const { data: newNote } = await client.models.Note.create({
-      gameRoom: "ExampleRoom",
+      gameRoom: username,
       description: gameRef.current.fen(),
     });
     
