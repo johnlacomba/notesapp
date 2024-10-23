@@ -45,7 +45,7 @@ export default function Board() {
   const [boardSize, setBoardSize] = useState(Math.min(window.innerWidth, window.innerHeight));
 
   useEffect(() => {
-    getUserInfo();
+    const username = getUserInfo();
     fetchNotes();  // Remember to rename all of these "note" references
   }, []);
 
@@ -53,6 +53,7 @@ export default function Board() {
     const user = await fetchUserAttributes();
     console.log("getUserInfo1: ", user);
     const username = user.email;
+    return username;
   }
   
   async function fetchNotes() {
@@ -76,10 +77,12 @@ export default function Board() {
     //    return note;
     //  })
     //);
-    console.log("fetchNotes2: ", game);
-    setGame(game.description);
+    if (game.length > 0) {
+      console.log("fetchNotes2: ", game);
+      setGame(game.description);
+    }
     updateGameState();  // Might not be needed
-   }
+  }
 
   const updateGameRoomDescription = async () => {
     try {
