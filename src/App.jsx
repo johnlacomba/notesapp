@@ -55,25 +55,25 @@ export default function Board() {
           const linkToStorageFile = await getUrl({
             path: ({ identityId }) => `media/${identityId}/boardstate`,
           });
-          console.log(gameRef.current.fen());
+          console.log("fetchNotes1: ", gameRef.current.fen());
           note.description = gameRef.current.fen();
         }
         return note;
       })
     );
-    console.log(game);
-    setGame(note.description);
+    console.log("fetchNotes2: ", game);
+    setGame(game);
     updateGameState();  // Might not be needed
    }
 
   async function createNote() {
-    console.log(gameRef.current.fen());
+    console.log("createNote1: ", gameRef.current.fen());
 
     const { data: newNote } = await client.models.Note.create({
       description: gameRef.current.fen(),
     });
     
-    console.log(newNote);
+    console.log("createNote2: ", newNote);
     if (newNote.description)
       if (newNote.description)
         await uploadData({
