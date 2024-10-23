@@ -59,9 +59,9 @@ export default function Board() {
 
   // Fetch notes when the username is available
   useEffect(() => {
-    //if (username) { // Ensure username is available
+    if (username) { // Ensure username is available
       fetchNotes(username); // Pass the username to fetchNotes
-    //}
+    }
   }, [username]); // Run when 'username' state changes
   
   async function getUserInfo() {
