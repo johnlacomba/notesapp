@@ -66,9 +66,7 @@ export default function Board() {
     updateGameState();  // Might not be needed
    }
 
-  async function createNote(event) {
-    event.preventDefault();
-    const form = new FormData(event.target);
+  async function createNote() {
     console.log(gameRef.current.fen());
 
     const { data: newNote } = await client.models.Note.create({
@@ -85,7 +83,6 @@ export default function Board() {
         }).result;
 
     fetchNotes();
-    event.target.reset();
   }
   
   // Handle resizing the board dynamically
@@ -129,6 +126,7 @@ export default function Board() {
     if (move) {
       setHistory([...history, move.san]);
       updateGameState();
+      createNote();
       setTimeout(makeStockfishMove, 500); // Delay before Stockfish responds
     }
   };
@@ -150,6 +148,7 @@ export default function Board() {
 
         gameRef.current.move({ from, to });
         updateGameState();
+        createNote();
       }
     };
   };
