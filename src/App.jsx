@@ -52,7 +52,7 @@ export default function Board() {
   async function getUserInfo() {
     const user = await fetchUserAttributes();
     console.log("getUserInfo1: ", user);
-    const username = user.username;
+    const username = user.email;
   }
   
   async function fetchNotes() {
