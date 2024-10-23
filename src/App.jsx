@@ -62,7 +62,7 @@ export default function Board() {
       })
     );
     console.log(game);
-    setGame(game);
+    setGame(note.description);
     updateGameState();  // Might not be needed
    }
 
