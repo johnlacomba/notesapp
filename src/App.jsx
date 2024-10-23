@@ -49,20 +49,20 @@ export default function Board() {
 
   async function fetchNotes() {
     const { data: game } = await client.models.Note.list();
-    await Promise.all(
-      game.map(async (note) => {
-        if (note.description) {
-          const linkToStorageFile = await getUrl({
-            path: ({ identityId }) => `media/${identityId}/boardstate`,
-          });
-          console.log("fetchNotes1: ", gameRef.current.fen());
-          note.description = gameRef.current.fen();
-        }
-        return note;
-      })
-    );
+    //await Promise.all(
+    //  game.map(async (note) => {
+    //    if (note.description) {
+    //      const linkToStorageFile = await getUrl({
+    //        path: ({ identityId }) => `media/${identityId}/boardstate`,
+    //      });
+    //      console.log("fetchNotes1: ", gameRef.current.fen());
+    //      note.description = gameRef.current.fen();
+    //    }
+    //    return note;
+    //  })
+    //);
     console.log("fetchNotes2: ", game);
-    setGame(game);
+    setGame(game.description);
     updateGameState();  // Might not be needed
    }
 
@@ -74,12 +74,12 @@ export default function Board() {
     });
     
     console.log("createNote2: ", newNote);
-    if (newNote.description)
-      if (newNote.description)
-        await uploadData({
-          path: ({ identityId }) => `media/${identityId}/boardstate`,
-          data: gameRef.current.fen(),
-        }).result;
+    //if (newNote.description)
+    //  if (newNote.description)
+    //    await uploadData({
+    //      path: ({ identityId }) => `media/${identityId}/boardstate`,
+    //      data: gameRef.current.fen(),
+    //    }).result;
 
     fetchNotes();
   }
