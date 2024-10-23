@@ -89,18 +89,20 @@ export default function Board() {
   }
 
   const updateGameRoomDescription = async () => {
+    console.log("getUserInfo5: ", username);
     try {
       // Step 1: Query the existing game room by username
       const { data: existingGameRoom } = await client.models.Note.list({
         gameRoom: { eq: username }, // Find game room with matching username
       });
-
+      console.log("existingGameRoom: ", existingGameRoom);
       if (existingGameRoom.length > 0) {
         const gameRoom = existingGameRoom[0]; // Get the first matching game room
 
         // Step 2: Update the description field with the new FEN state
         const { data: updatedGameRoom } = await client.models.Note.update({
           id: gameRoom.id, // Use the ID of the existing game room
+          gameRoom: username,
           description: gameRef.current.fen(), // Update the description
         });
 
@@ -212,6 +214,8 @@ export default function Board() {
     }
   };
 
+  fetchNotes(username);
+  
   return (
     <Authenticator>
       {({ signOut }) => (
