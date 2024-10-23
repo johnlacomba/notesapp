@@ -49,8 +49,8 @@ export default function Board() {
   useEffect(() => {
     const fetchUser = async () => {
       const user = await getUserInfo();
-      console.log("getUserInfo3: ", user.email);
-      setUsername(user.email); // Set the username once fetched
+      console.log("getUserInfo3: ", user);
+      setUsername(user); // Set the username once fetched
     };
 
     fetchUser();
@@ -66,9 +66,9 @@ export default function Board() {
   async function getUserInfo() {
     const user = await fetchUserAttributes();
     console.log("getUserInfo1: ", user);
-    const username = user.email;
-    console.log("getUserInfo2: ", username);
-    return username;
+    const theusername = user.email;
+    console.log("getUserInfo2: ", theusername);
+    return theusername;
   }
   
   //useEffect(() => {
