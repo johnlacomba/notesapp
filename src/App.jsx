@@ -51,6 +51,7 @@ export default function Board() {
       const user = await getUserInfo();
       console.log("getUserInfo3: ", user);
       setUsername(user); // Set the username once fetched
+      console.log("getUserInfo4: ", username);
     };
 
     fetchUser();
