@@ -27,6 +27,15 @@ const client = generateClient({
   authMode: "userPool",
 });
 
+const username = getUserInfo();
+
+async function getUserInfo() {
+  const user = await fetchUserAttributes();
+  console.log("getUserInfo1: ", user);
+  const username = user.email;
+  return username;
+}
+
 const buttonStyle = {
   cursor: "pointer",
   padding: "10px 20px",
@@ -45,23 +54,13 @@ export default function Board() {
   const [boardSize, setBoardSize] = useState(Math.min(window.innerWidth, window.innerHeight));
 
   useEffect(() => {
-    const username = getUserInfo();
     fetchNotes();  // Remember to rename all of these "note" references
   }, []);
-
-  async function getUserInfo() {
-    const user = await fetchUserAttributes();
-    console.log("getUserInfo1: ", user);
-    const username = user.email;
-    return username;
-  }
   
   async function fetchNotes() {
     //const { data: game, errors } = await client.models.Note.get({
     //  id: '...',
     //});
-    
-    console.log("Debug1: ", username);  // Debug
     const { data: game } = await client.models.Note.list({
       gameRoom: { eq: username }, // Find game room with matching username 
     });
