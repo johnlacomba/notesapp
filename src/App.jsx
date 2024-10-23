@@ -27,15 +27,6 @@ const client = generateClient({
   authMode: "userPool",
 });
 
-const username = getUserInfo();
-
-async function getUserInfo() {
-  const user = await fetchUserAttributes();
-  console.log("getUserInfo1: ", user);
-  const username = user.email;
-  return username;
-}
-
 const buttonStyle = {
   cursor: "pointer",
   padding: "10px 20px",
@@ -53,6 +44,17 @@ export default function Board() {
   const [history, setHistory] = useState([]);
   const [boardSize, setBoardSize] = useState(Math.min(window.innerWidth, window.innerHeight));
 
+  useEffect(() => {
+    const username = getUserInfo();
+  }, []);
+
+  async function getUserInfo() {
+    const user = await fetchUserAttributes();
+    console.log("getUserInfo1: ", user);
+    const username = user.email;
+    return username;
+  }
+  
   useEffect(() => {
     fetchNotes();  // Remember to rename all of these "note" references
   }, []);
@@ -76,9 +78,9 @@ export default function Board() {
     //    return note;
     //  })
     //);
-    if (game.length > 0) {
-      console.log("fetchNotes2: ", game);
-      setGame(game.description);
+    if (game[0].length > 0) {
+      console.log("fetchNotes2: ", game[0]);
+      setGame(game[0].description);
     }
     updateGameState();  // Might not be needed
   }
