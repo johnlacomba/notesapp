@@ -70,6 +70,7 @@ export default function Board() {
     console.log("createNote1: ", gameRef.current.fen());
 
     const { data: newNote } = await client.models.Note.create({
+      gameRoom: "ExampleRoom",
       description: gameRef.current.fen(),
     });
     
