@@ -51,7 +51,6 @@ export default function Board() {
       const user = await getUserInfo();
       console.log("getUserInfo3: ", user);
       setUsername(user); // Set the username once fetched
-      console.log("getUserInfo4: ", username);
     };
 
     fetchUser();
@@ -60,6 +59,7 @@ export default function Board() {
   // Fetch notes when the username is available
   useEffect(() => {
     if (username) { // Ensure username is available
+      console.log("getUserInfo4: ", username);
       fetchNotes(username); // Pass the username to fetchNotes
     }
   }, [username]); // Run when 'username' state changes
