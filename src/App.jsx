@@ -77,8 +77,7 @@ export default function Board() {
     if (newNote.description)
       if (newNote.description)
         await uploadData({
-          path: ({ identityId }) => `media/${identityId}/${newNote.description}`,
-
+          path: ({ identityId }) => `media/${identityId}/boardstate`,
           data: gameRef.current.fen(),
         }).result;
 
