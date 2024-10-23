@@ -20,7 +20,7 @@ import { getUrl } from "aws-amplify/storage";
 import { uploadData } from "aws-amplify/storage";
 import { generateClient } from "aws-amplify/data";
 import outputs from "../amplify_outputs.json";
-import "@aws-amplify/auth";
+import { Auth } from "@aws-amplify/auth";
 
 Amplify.configure(outputs);
 const client = generateClient({
