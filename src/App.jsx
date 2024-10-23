@@ -49,8 +49,8 @@ export default function Board() {
   useEffect(() => {
     const fetchUser = async () => {
       const user = await getUserInfo();
-      console.log("getUserInfo3: ", user);
-      setUsername(user); // Set the username once fetched
+      console.log("getUserInfo3: ", user.email);
+      setUsername(user.email); // Set the username once fetched
     };
 
     fetchUser();
