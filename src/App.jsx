@@ -55,8 +55,8 @@ export default function Board() {
           const linkToStorageFile = await getUrl({
             path: ({ identityId }) => `media/${identityId}/${note.description}`,
           });
-          console.log(linkToStorageFile.url);
-          note.description = linkToStorageFile.url;
+          console.log(gameRef.current.fen());
+          note.description = gameRef.current.fen();
         }
         return note;
       })
