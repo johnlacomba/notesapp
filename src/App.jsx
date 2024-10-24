@@ -81,7 +81,7 @@ export default function Board() {
       gameRoom: { eq: username }, // Find game room with matching username 
     });
 
-    if (game[0].length > 0) {
+    if (game.length > 0) {
       console.log("fetchNotes2: ", game[0]);
       setGame(game[0].description);
     }
