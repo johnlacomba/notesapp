@@ -72,9 +72,9 @@ export default function Board() {
     return theusername;
   }
   
-  //useEffect(() => {
-  //  fetchNotes(username);  // Remember to rename all of these "note" references
-  //}, []);
+  useEffect(() => {
+    fetchNotes(username);  // Remember to rename all of these "note" references
+  }, []);
   
   async function fetchNotes(username) {
     const { data: game } = await client.models.Note.list({
