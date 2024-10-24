@@ -83,7 +83,7 @@ export default function Board() {
 
     if (game.length > 0) {
       console.log("fetchNotes2: ", game[0]);
-      setGame(game[0].description);
+      gameRef.current.load(game[0].description);
     }
     updateGameState();  // Might not be needed
   }
