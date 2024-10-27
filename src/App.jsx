@@ -44,7 +44,10 @@ export default function Board() {
   const [game, setGame] = useState(new Chess());
   const [history, setHistory] = useState([]);
   const [boardSize, setBoardSize] = useState(Math.min(window.innerWidth, window.innerHeight));
-
+  const [currentPlayer, setCurrentPlayer] = useState('w'); // 'w' for white, 'b' for black
+  const whitePlayer = null;
+  const blackPlayer = null;
+  
   // Fetch the user info on component mount
   useEffect(() => {
     const fetchUser = async () => {
@@ -98,12 +101,22 @@ export default function Board() {
       console.log("existingGameRoom: ", existingGameRoom);
       if (existingGameRoom.length > 0) {
         const gameRoom = existingGameRoom[0]; // Get the first matching game room
-
+        switch(currentPlayer) {
+          case "w":
+            whitePlayer = currentPlayer;
+            break;
+          case "b":
+            blackPlayer = currentPlayer;
+            break;
+        }
+      
         // Step 2: Update the description field with the new FEN state
         const { data: updatedGameRoom } = await client.models.Note.update({
           id: gameRoom.id, // Use the ID of the existing game room
           gameRoom: username,
           description: gameRef.current.fen(), // Update the description
+          whitePlayer: whitePlayer,
+          blackPlayer: blackPlayer,
         });
 
         console.log("Game room updated:", updatedGameRoom);
@@ -161,6 +174,7 @@ export default function Board() {
 
   const updateGameState = () => {
     setGame(new Chess(gameRef.current.fen())); // Trigger re-render
+    setCurrentPlayer(gameRef.current.turn()); // Update current player ('w' or 'b')
   };
 
   const makeMove = (move) => {
