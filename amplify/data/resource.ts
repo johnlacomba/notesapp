@@ -5,6 +5,8 @@ const schema = a.schema({
     .model({
       gameRoom: a.string(),
       description: a.string(),
+      whitePlayer: a.string(),
+      blackPlayer: a.string(),
     })
     .authorization((allow) => [allow.owner()]),
 });
