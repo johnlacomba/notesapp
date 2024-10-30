@@ -37,6 +37,30 @@ const buttonStyle = {
   boxShadow: "0 2px 5px rgba(0, 0, 0, 0.5)",
 };
 
+// Modal styling
+const modalStyles = {
+  position: "fixed",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  padding: "20px",
+  backgroundColor: "white",
+  boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+  borderRadius: "8px",
+  textAlign: "center",
+  zIndex: 1000,
+};
+
+const overlayStyles = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  zIndex: 999,
+};
+
 export default function Board() {
   const gameRef = useRef(new Chess()); // Stable game instance
   const stockfishRef = useRef(null); // Stockfish worker reference
@@ -45,7 +69,15 @@ export default function Board() {
   const [history, setHistory] = useState([]);
   const [boardSize, setBoardSize] = useState(Math.min(window.innerWidth, window.innerHeight));
   const [currentPlayer, setCurrentPlayer] = useState('w'); // 'w' for white, 'b' for black
-  
+  const [showModal, setShowModal] = useState(true); // Modal visibility
+  const [boardReady, setBoardReady] = useState(false); // Chessboard rendering
+
+  // Function to close the modal and show the chessboard
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setBoardReady(true); // Allow the chessboard to render
+  };
+
   // Fetch the user info on component mount
   useEffect(() => {
     const fetchUser = async () => {
@@ -133,25 +165,6 @@ export default function Board() {
     }
   };
   
-  async function createNote() {
-    console.log("createNote1: ", gameRef.current.fen());
-
-    const { data: newNote } = await client.models.Note.create({
-      gameRoom: username,
-      description: gameRef.current.fen(),
-    });
-    
-    console.log("createNote2: ", newNote);
-    //if (newNote.description)
-    //  if (newNote.description)
-    //    await uploadData({
-    //      path: ({ identityId }) => `media/${identityId}/boardstate`,
-    //      data: gameRef.current.fen(),
-    //    }).result;
-
-    fetchNotes();
-  }
-  
   // Handle resizing the board dynamically
   useEffect(() => {
     const updateBoardSize = () => {
@@ -231,7 +244,7 @@ export default function Board() {
   
   return (
     <Authenticator>
-      {({ signOut }) => (
+      {({ signOut, user }) => (
         <Flex
           className="App"
           justifyContent="center"
@@ -239,38 +252,55 @@ export default function Board() {
           direction="column"
           width="70%"
           margin="0 auto"
-        >
-          <View>
-            <div id="chessboard-wrapper">
-              <div id="chessboard-container">
-                <Chessboard
-                  position={game.fen()}
-                  onPieceDrop={onDrop}
-                  animationDuration={200}
-                  customBoardStyle={{
-                    borderRadius: "4px",
-                    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
-                  }}
-                />
+        >  
+          {/* Modal */}
+          {showModal && (
+            <>
+              <div style={overlayStyles} />
+              <div style={modalStyles}>
+                <h2>Welcome, {user.username}!</h2>
+                <p>Are you ready to start the game?</p>
+                <Button onClick={handleCloseModal}>Let's Play!</Button>
               </div>
-              <div id="buttons-container">
-                <button
-                  style={buttonStyle}
-                  onClick={() => {
-                    gameRef.current.reset();
-                    setHistory([]);
-                    updateGameState();
-                  }}
-                >
-                  reset
-                </button>
-                <button style={buttonStyle} onClick={handleUndo}>
-                  undo
-                </button>
+            </>
+          )}
+
+          {/* Chessboard (Only render after modal is dismissed) */}
+          {boardReady && (
+            <View>
+              <div id="chessboard-wrapper">
+                <div id="chessboard-container">
+                  <h2>Current Player: {currentPlayer === 'w' ? 'White' : 'Black'}</h2>
+                  <Chessboard
+                    position={gameRef.current.fen()}
+                    onPieceDrop={onDrop}
+                    animationDuration={200}
+                    customBoardStyle={{
+                      borderRadius: "4px",
+                      boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+                    }}
+                  />
+                </div>
+                <div id="buttons-container">
+                  <button
+                    style={buttonStyle}
+                    onClick={() => {
+                      gameRef.current.reset();
+                      setCurrentPlayer('w');
+                      setHistory([]);
+                      updateGameState();
+                    }}
+                  >
+                    reset
+                  </button>
+                  <button style={buttonStyle} onClick={handleUndo}>
+                    undo
+                  </button>
+                </div>
               </div>
-            </div>
-          </View>
-            <Button onClick={signOut}>Sign Out</Button>
+            </View>
+          )}
+          <Button onClick={signOut}>Sign Out</Button>
         </Flex>
       )}
       </Authenticator>
