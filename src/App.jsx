@@ -45,8 +45,6 @@ export default function Board() {
   const [history, setHistory] = useState([]);
   const [boardSize, setBoardSize] = useState(Math.min(window.innerWidth, window.innerHeight));
   const [currentPlayer, setCurrentPlayer] = useState('w'); // 'w' for white, 'b' for black
-  const whitePlayer = null;
-  const blackPlayer = null;
   
   // Fetch the user info on component mount
   useEffect(() => {
@@ -92,6 +90,8 @@ export default function Board() {
   }
 
   const updateGameRoomDescription = async () => {
+    whitePlayer = null;
+    blackPlayer = null;
     console.log("getUserInfo5: ", username);
     try {
       // Step 1: Query the existing game room by username
@@ -101,6 +101,7 @@ export default function Board() {
       console.log("existingGameRoom: ", existingGameRoom);
       if (existingGameRoom.length > 0) {
         const gameRoom = existingGameRoom[0]; // Get the first matching game room
+        // Determine the username playing each side
         switch(currentPlayer) {
           case "w":
             whitePlayer = currentPlayer;
