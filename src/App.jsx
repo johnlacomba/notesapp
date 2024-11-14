@@ -21,6 +21,7 @@ import { uploadData } from "aws-amplify/storage";
 import { generateClient } from "aws-amplify/data";
 import outputs from "../amplify_outputs.json";
 import { fetchUserAttributes } from 'aws-amplify/auth';
+import { Auth } from "aws-amplify";
 
 Amplify.configure(outputs);
 const client = generateClient({
@@ -95,7 +96,7 @@ export default function Board() {
   // Fetch user and notes when the user is authenticated and `username` is not set
   useEffect(() => {
     (async () => {
-      const user = await fetchUserAttributes();
+      const user = await Auth.currentAuthenticatedUser();
       if (user && !username) {
         const fetchedUsername = await getUserInfo();
         setUsername(fetchedUsername);
