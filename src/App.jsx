@@ -27,39 +27,11 @@ const client = generateClient({
   authMode: "userPool",
 });
 
-const buttonStyle = {
-  cursor: "pointer",
-  padding: "10px 20px",
-  margin: "10px 0", // Add vertical margin
-  borderRadius: "6px",
-  backgroundColor: "#f0d9b5",
-  border: "none",
-  boxShadow: "0 2px 5px rgba(0, 0, 0, 0.5)",
-};
+const buttonStyle = { /* your button style */ };
 
-// Modal styling
-const modalStyles = {
-  position: "fixed",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  padding: "20px",
-  backgroundColor: "white",
-  boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
-  borderRadius: "8px",
-  textAlign: "center",
-  zIndex: 1000,
-};
+const modalStyles = { /* your modal style */ };
 
-const overlayStyles = {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  width: "100%",
-  height: "100%",
-  backgroundColor: "rgba(0, 0, 0, 0.5)",
-  zIndex: 999,
-};
+const overlayStyles = { /* your overlay style */ };
 
 export default function Board() {
   const gameRef = useRef(new Chess()); // Stable game instance
@@ -78,47 +50,21 @@ export default function Board() {
     setBoardReady(true); // Allow the chessboard to render
   };
 
-  // Fetch the user info on component mount
-  useEffect(() => {
-    const fetchUser = async () => {
-      const user = await getUserInfo();
-      console.log("getUserInfo3: ", user);
-      setUsername(user); // Set the username once fetched
-    };
-
-    fetchUser();
-  }, []);
-
-  // Fetch notes when the username is available
-  useEffect(() => {
-    if (username) { // Ensure username is available
-      console.log("getUserInfo4: ", username);
-      fetchNotes(username); // Pass the username to fetchNotes
-    }
-  }, [username]); // Run when 'username' state changes
-  
   async function getUserInfo() {
     const user = await fetchUserAttributes();
-    console.log("getUserInfo1: ", user);
     const theusername = user.email;
-    console.log("getUserInfo2: ", theusername);
     return theusername;
   }
-  
-  //useEffect(() => {
-  //  fetchNotes(username);  // Remember to rename all of these "note" references
-  //}, []);
-  
+
   async function fetchNotes(username) {
     const { data: game } = await client.models.Note.list({
       gameRoom: { eq: username }, // Find game room with matching username 
     });
 
     if (game.length > 0) {
-      console.log("fetchNotes2: ", game[0]);
       gameRef.current.load(game[0].description);
     }
-    updateGameState();  // Might not be needed
+    updateGameState(); // Might not be needed
   }
 
   const updateGameRoomDescription = async () => {
@@ -164,7 +110,7 @@ export default function Board() {
       console.error("Error updating game room:", error);
     }
   };
-  
+
   // Handle resizing the board dynamically
   useEffect(() => {
     const updateBoardSize = () => {
@@ -173,13 +119,13 @@ export default function Board() {
       document.documentElement.style.setProperty("--board-size", `${size}px`);
     };
 
-    // Update size on load and whenever the window is resized
+	// Update size on load and whenever the window is resized
     window.addEventListener("resize", updateBoardSize);
     updateBoardSize();
 
     return () => window.removeEventListener("resize", updateBoardSize);
   }, []);
-  
+
   // Initialize Stockfish using a local instance when the component mounts
   useEffect(() => {
     stockfishRef.current = new Worker("./stockfish.js");
@@ -201,7 +147,7 @@ export default function Board() {
     const move = gameRef.current.move({
       from: sourceSquare,
       to: targetSquare,
-      promotion: "q", // Promote to queen
+      promotion: "q", // Automatically promote to queen
     });
 
     if (move) {
@@ -215,11 +161,11 @@ export default function Board() {
   const makeStockfishMove = () => {
     if (gameRef.current.isGameOver()) return; // Stop if the game is over
 
-    // Send the current position to Stockfish
+	// Send the current position to Stockfish
     stockfishRef.current.postMessage(`position fen ${gameRef.current.fen()}`);
     stockfishRef.current.postMessage("go depth 15"); // Ask for best move
 
-    // Listen for Stockfish's best move
+	// Listen for Stockfish's best move
     stockfishRef.current.onmessage = (event) => {
       const message = event.data;
       if (message.startsWith("bestmove")) {
@@ -241,68 +187,77 @@ export default function Board() {
       updateGameState();
     }
   };
-  
+
   return (
     <Authenticator>
-      {({ signOut, user }) => (
-        <Flex
-          className="App"
-          justifyContent="center"
-          alignItems="center"
-          direction="column"
-          width="70%"
-          margin="0 auto"
-        >  
-          {/* Modal */}
-          {showModal && (
-            <>
-              <div style={overlayStyles} />
-              <div style={modalStyles}>
-                <h2>Welcome, {user.username}!</h2>
-                <p>Are you ready to start the game?</p>
-                <Button onClick={handleCloseModal}>Let's Play!</Button>
-              </div>
-            </>
-          )}
+      {({ signOut, user }) => {
+        useEffect(() => {
+          if (user && !username) {  // Ensure the user data is only fetched once
+            (async () => {
+              const fetchedUsername = await getUserInfo();
+              setUsername(fetchedUsername);
+              fetchNotes(fetchedUsername);
+            })();
+          }
+        }, [user]);
 
-          {/* Chessboard (Only render after modal is dismissed) */}
-          {boardReady && (
-            <View>
-              <div id="chessboard-wrapper">
-                <div id="chessboard-container">
-                  <h2>Current Player: {currentPlayer === 'w' ? 'White' : 'Black'}</h2>
-                  <Chessboard
-                    position={gameRef.current.fen()}
-                    onPieceDrop={onDrop}
-                    animationDuration={200}
-                    customBoardStyle={{
-                      borderRadius: "4px",
-                      boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
-                    }}
-                  />
+        return (
+          <Flex
+            className="App"
+            justifyContent="center"
+            alignItems="center"
+            direction="column"
+            width="70%"
+            margin="0 auto"
+          >
+			{/* Modal */}
+            {showModal && (
+              <>
+                <div style={overlayStyles} />
+                <div style={modalStyles}>
+                  <h2>Welcome, {user.email}!</h2>
+                  <p>Are you ready to start the game?</p>
+                  <Button onClick={handleCloseModal}>Let's Play!</Button>
                 </div>
-                <div id="buttons-container">
-                  <button
-                    style={buttonStyle}
-                    onClick={() => {
+              </>
+            )}
+
+			{/* Chessboard (Only render after modal is dismissed) */}
+            {boardReady && (
+              <View>
+                <div id="chessboard-wrapper">
+                  <div id="chessboard-container">
+                    <h2>Current Player: {currentPlayer === 'w' ? 'White' : 'Black'}</h2>
+                    <Chessboard
+                      position={game.fen()}
+                      onPieceDrop={onDrop}
+                      animationDuration={200}
+                      customBoardStyle={{
+                        borderRadius: "4px",
+                        boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+                      }}
+                    />
+                  </div>
+                  <div id="buttons-container">
+                    <button style={buttonStyle} onClick={() => {
                       gameRef.current.reset();
                       setCurrentPlayer('w');
                       setHistory([]);
                       updateGameState();
-                    }}
-                  >
-                    reset
-                  </button>
-                  <button style={buttonStyle} onClick={handleUndo}>
-                    undo
-                  </button>
+                    }}>
+                      reset
+                    </button>
+                    <button style={buttonStyle} onClick={handleUndo}>
+                      undo
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </View>
-          )}
-          <Button onClick={signOut}>Sign Out</Button>
-        </Flex>
-      )}
-      </Authenticator>
+              </View>
+            )}
+            <Button onClick={signOut}>Sign Out</Button>
+          </Flex>
+        );
+      }}
+    </Authenticator>
   );
 }
