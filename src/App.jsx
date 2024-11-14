@@ -67,6 +67,18 @@ export default function Board() {
     updateGameState(); // Might not be needed
   }
 
+  // Fetch user and notes when the user is authenticated and `username` is not set
+  useEffect(() => {
+    (async () => {
+      const user = await Auth.currentAuthenticatedUser();
+      if (user && !username) {
+        const fetchedUsername = await getUserInfo();
+        setUsername(fetchedUsername);
+        await fetchNotes(fetchedUsername);
+      }
+    })();
+  }, [username]);
+	
   const updateGameRoomDescription = async () => {
     whitePlayer = null;
     blackPlayer = null;
@@ -190,74 +202,54 @@ export default function Board() {
 
   return (
     <Authenticator>
-      {({ signOut, user }) => {
-        useEffect(() => {
-          if (user && !username) {  // Ensure the user data is only fetched once
-            (async () => {
-              const fetchedUsername = await getUserInfo();
-              setUsername(fetchedUsername);
-              fetchNotes(fetchedUsername);
-            })();
-          }
-        }, [user]);
-
-        return (
-          <Flex
-            className="App"
-            justifyContent="center"
-            alignItems="center"
-            direction="column"
-            width="70%"
-            margin="0 auto"
-          >
-			{/* Modal */}
-            {showModal && (
-              <>
-                <div style={overlayStyles} />
-                <div style={modalStyles}>
-                  <h2>Welcome, {user.email}!</h2>
-                  <p>Are you ready to start the game?</p>
-                  <Button onClick={handleCloseModal}>Let's Play!</Button>
+      {({ signOut, user }) => (
+        <Flex className="App" justifyContent="center" alignItems="center" direction="column" width="70%" margin="0 auto">
+            {/* Modal */}
+	    {showModal && (
+            <>
+              <div style={overlayStyles} />
+              <div style={modalStyles}>
+                <h2>Welcome, {user.email}!</h2>
+                <p>Are you ready to start the game?</p>
+                <Button onClick={handleCloseModal}>Let's Play!</Button>
+              </div>
+            </>
+          )}
+	  {/* Chessboard (Only render after modal is dismissed) */}
+          {boardReady && (
+            <View>
+              <div id="chessboard-wrapper">
+                <div id="chessboard-container">
+                  <h2>Current Player: {currentPlayer === 'w' ? 'White' : 'Black'}</h2>
+                  <Chessboard
+                    position={game.fen()}
+                    onPieceDrop={onDrop}
+                    animationDuration={200}
+                    customBoardStyle={{
+                      borderRadius: "4px",
+                      boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+                    }}
+                  />
                 </div>
-              </>
-            )}
-
-			{/* Chessboard (Only render after modal is dismissed) */}
-            {boardReady && (
-              <View>
-                <div id="chessboard-wrapper">
-                  <div id="chessboard-container">
-                    <h2>Current Player: {currentPlayer === 'w' ? 'White' : 'Black'}</h2>
-                    <Chessboard
-                      position={game.fen()}
-                      onPieceDrop={onDrop}
-                      animationDuration={200}
-                      customBoardStyle={{
-                        borderRadius: "4px",
-                        boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
-                      }}
-                    />
-                  </div>
-                  <div id="buttons-container">
-                    <button style={buttonStyle} onClick={() => {
-                      gameRef.current.reset();
-                      setCurrentPlayer('w');
-                      setHistory([]);
-                      updateGameState();
-                    }}>
-                      reset
-                    </button>
-                    <button style={buttonStyle} onClick={handleUndo}>
-                      undo
-                    </button>
-                  </div>
+                <div id="buttons-container">
+                  <button style={buttonStyle} onClick={() => {
+                    gameRef.current.reset();
+                    setCurrentPlayer('w');
+                    setHistory([]);
+                    updateGameState();
+                  }}>
+                    reset
+                  </button>
+                  <button style={buttonStyle} onClick={handleUndo}>
+                    undo
+                  </button>
                 </div>
-              </View>
-            )}
-            <Button onClick={signOut}>Sign Out</Button>
-          </Flex>
-        );
-      }}
+              </div>
+            </View>
+          )}
+          <Button onClick={signOut}>Sign Out</Button>
+        </Flex>
+      )}
     </Authenticator>
   );
 }
