@@ -27,11 +27,36 @@ const client = generateClient({
   authMode: "userPool",
 });
 
-const buttonStyle = { /* your button style */ };
+const buttonStyle = {
+  cursor: "pointer",
+  padding: "10px 20px",
+  margin: "10px 0", // Add vertical margin
+  borderRadius: "6px",
+  backgroundColor: "#f0d9b5",
+  border: "none",
+  boxShadow: "0 2px 5px rgba(0, 0, 0, 0.5)",};
 
-const modalStyles = { /* your modal style */ };
+const modalStyles = {
+  osition: "fixed",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  padding: "20px",
+  backgroundColor: "white",
+  boxShadow: "0 2px 10px rgba(0, 0, 0, 0.5)",
+  borderRadius: "8px",
+  textAlign: "center",
+  zIndex: 1000,
+};
 
-const overlayStyles = { /* your overlay style */ };
+const overlayStyles = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  zIndex: 999,};
 
 export default function Board() {
   const gameRef = useRef(new Chess()); // Stable game instance
@@ -70,7 +95,7 @@ export default function Board() {
   // Fetch user and notes when the user is authenticated and `username` is not set
   useEffect(() => {
     (async () => {
-      const user = await Auth.currentAuthenticatedUser();
+      const user = await fetchUserAttributes();
       if (user && !username) {
         const fetchedUsername = await getUserInfo();
         setUsername(fetchedUsername);
