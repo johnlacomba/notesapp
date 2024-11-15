@@ -250,7 +250,7 @@ export default function Board() {
             <>
               <div style={overlayStyles} />
               <div style={modalStyles}>
-                <h2>Welcome, {user.signInDetails[loginId]}!</h2>
+                <h2>Welcome, {user.signInDetails.loginId}!</h2>
                 <p>Are you ready to start the game?</p>
                 
                 <Button onClick={() => {
