@@ -21,7 +21,6 @@ import { uploadData } from "aws-amplify/storage";
 import { generateClient } from "aws-amplify/data";
 import outputs from "../amplify_outputs.json";
 import { fetchUserAttributes } from 'aws-amplify/auth';
-import { Auth } from "aws-amplify";
 
 Amplify.configure(outputs);
 const client = generateClient({
@@ -35,10 +34,12 @@ const buttonStyle = {
   borderRadius: "6px",
   backgroundColor: "#f0d9b5",
   border: "none",
-  boxShadow: "0 2px 5px rgba(0, 0, 0, 0.5)",};
+  boxShadow: "0 2px 5px rgba(0, 0, 0, 0.5)",
+};
 
+// Modal styling
 const modalStyles = {
-  osition: "fixed",
+  position: "fixed",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
@@ -57,7 +58,8 @@ const overlayStyles = {
   width: "100%",
   height: "100%",
   backgroundColor: "rgba(0, 0, 0, 0.5)",
-  zIndex: 999,};
+  zIndex: 999,
+};
 
 export default function Board() {
   const gameRef = useRef(new Chess()); // Stable game instance
@@ -76,35 +78,49 @@ export default function Board() {
     setBoardReady(true); // Allow the chessboard to render
   };
 
+  // Fetch the user info on component mount
+  useEffect(() => {
+    const fetchUser = async () => {
+      const user = await getUserInfo();
+      console.log("getUserInfo3: ", user);
+      setUsername(user); // Set the username once fetched
+    };
+
+    fetchUser();
+  }, []);
+
+  // Fetch notes when the username is available
+  useEffect(() => {
+    if (username) { // Ensure username is available
+      console.log("getUserInfo4: ", username);
+      fetchNotes(username); // Pass the username to fetchNotes
+    }
+  }, [username]); // Run when 'username' state changes
+  
   async function getUserInfo() {
     const user = await fetchUserAttributes();
+    console.log("getUserInfo1: ", user);
     const theusername = user.email;
+    console.log("getUserInfo2: ", theusername);
     return theusername;
   }
-
+  
+  //useEffect(() => {
+  //  fetchNotes(username);  // Remember to rename all of these "note" references
+  //}, []);
+  
   async function fetchNotes(username) {
     const { data: game } = await client.models.Note.list({
       gameRoom: { eq: username }, // Find game room with matching username 
     });
 
     if (game.length > 0) {
+      console.log("fetchNotes2: ", game[0]);
       gameRef.current.load(game[0].description);
     }
-    updateGameState(); // Might not be needed
+    updateGameState();  // Might not be needed
   }
 
-  // Fetch user and notes when the user is authenticated and `username` is not set
-  useEffect(() => {
-    (async () => {
-      const user = await Auth.currentAuthenticatedUser();
-      if (user && !username) {
-        const fetchedUsername = await getUserInfo();
-        setUsername(fetchedUsername);
-        await fetchNotes(fetchedUsername);
-      }
-    })();
-  }, [username]);
-	
   const updateGameRoomDescription = async () => {
     whitePlayer = null;
     blackPlayer = null;
@@ -148,7 +164,7 @@ export default function Board() {
       console.error("Error updating game room:", error);
     }
   };
-
+  
   // Handle resizing the board dynamically
   useEffect(() => {
     const updateBoardSize = () => {
@@ -157,13 +173,13 @@ export default function Board() {
       document.documentElement.style.setProperty("--board-size", `${size}px`);
     };
 
-	// Update size on load and whenever the window is resized
+    // Update size on load and whenever the window is resized
     window.addEventListener("resize", updateBoardSize);
     updateBoardSize();
 
     return () => window.removeEventListener("resize", updateBoardSize);
   }, []);
-
+  
   // Initialize Stockfish using a local instance when the component mounts
   useEffect(() => {
     stockfishRef.current = new Worker("./stockfish.js");
@@ -185,7 +201,7 @@ export default function Board() {
     const move = gameRef.current.move({
       from: sourceSquare,
       to: targetSquare,
-      promotion: "q", // Automatically promote to queen
+      promotion: "q", // Promote to queen
     });
 
     if (move) {
@@ -199,11 +215,11 @@ export default function Board() {
   const makeStockfishMove = () => {
     if (gameRef.current.isGameOver()) return; // Stop if the game is over
 
-	// Send the current position to Stockfish
+    // Send the current position to Stockfish
     stockfishRef.current.postMessage(`position fen ${gameRef.current.fen()}`);
     stockfishRef.current.postMessage("go depth 15"); // Ask for best move
 
-	// Listen for Stockfish's best move
+    // Listen for Stockfish's best move
     stockfishRef.current.onmessage = (event) => {
       const message = event.data;
       if (message.startsWith("bestmove")) {
@@ -225,30 +241,38 @@ export default function Board() {
       updateGameState();
     }
   };
-
+  
   return (
     <Authenticator>
       {({ signOut, user }) => (
-        <Flex className="App" justifyContent="center" alignItems="center" direction="column" width="70%" margin="0 auto">
-            {/* Modal */}
-	    {showModal && (
+        <Flex
+          className="App"
+          justifyContent="center"
+          alignItems="center"
+          direction="column"
+          width="70%"
+          margin="0 auto"
+        >  
+          {/* Modal */}
+          {showModal && (
             <>
               <div style={overlayStyles} />
               <div style={modalStyles}>
-                <h2>Welcome, {user.email}!</h2>
+                <h2>Welcome, {user.username}!</h2>
                 <p>Are you ready to start the game?</p>
                 <Button onClick={handleCloseModal}>Let's Play!</Button>
               </div>
             </>
           )}
-	  {/* Chessboard (Only render after modal is dismissed) */}
+
+          {/* Chessboard (Only render after modal is dismissed) */}
           {boardReady && (
             <View>
               <div id="chessboard-wrapper">
                 <div id="chessboard-container">
                   <h2>Current Player: {currentPlayer === 'w' ? 'White' : 'Black'}</h2>
                   <Chessboard
-                    position={game.fen()}
+                    position={gameRef.current.fen()}
                     onPieceDrop={onDrop}
                     animationDuration={200}
                     customBoardStyle={{
@@ -258,12 +282,15 @@ export default function Board() {
                   />
                 </div>
                 <div id="buttons-container">
-                  <button style={buttonStyle} onClick={() => {
-                    gameRef.current.reset();
-                    setCurrentPlayer('w');
-                    setHistory([]);
-                    updateGameState();
-                  }}>
+                  <button
+                    style={buttonStyle}
+                    onClick={() => {
+                      gameRef.current.reset();
+                      setCurrentPlayer('w');
+                      setHistory([]);
+                      updateGameState();
+                    }}
+                  >
                     reset
                   </button>
                   <button style={buttonStyle} onClick={handleUndo}>
@@ -276,6 +303,6 @@ export default function Board() {
           <Button onClick={signOut}>Sign Out</Button>
         </Flex>
       )}
-    </Authenticator>
+      </Authenticator>
   );
 }
