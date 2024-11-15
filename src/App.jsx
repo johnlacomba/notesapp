@@ -78,18 +78,14 @@ export default function Board() {
     setBoardReady(true); // Allow the chessboard to render
   };
 
-  // Fetch the user info on component mount
-  useEffect(() => {
-    const fetchUser = async () => {
-      const user = await getUserInfo();
-      console.log("getUserInfo3: ", user);
-      setUsername(user); // Set the username once fetched
-    };
-
-    fetchUser();
-  }, []);
-
-  // Fetch notes when the username is available
+  // Fetch the user info
+  async function fetchUser() {
+    const user = await getUserInfo();
+    console.log("getUserInfo3: ", user);
+    setUsername(user); // Set the username once fetched
+  }
+  
+  // Fetch game data when the username is available
   useEffect(() => {
     if (username) { // Ensure username is available
       console.log("getUserInfo4: ", username);
@@ -104,10 +100,6 @@ export default function Board() {
     console.log("getUserInfo2: ", theusername);
     return theusername;
   }
-  
-  //useEffect(() => {
-  //  fetchNotes(username);  // Remember to rename all of these "note" references
-  //}, []);
   
   async function fetchNotes(username) {
     const { data: game } = await client.models.Note.list({
@@ -260,7 +252,13 @@ export default function Board() {
               <div style={modalStyles}>
                 <h2>Welcome, {user.username}!</h2>
                 <p>Are you ready to start the game?</p>
-                <Button onClick={handleCloseModal}>Let's Play!</Button>
+                
+                <Button onClick={() => {
+                      handleCloseModal();
+                      fetchUser();
+                      updateGameState();
+                    }}
+                >Let's Play!</Button>
               </div>
             </>
           )}
