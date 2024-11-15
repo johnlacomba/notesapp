@@ -105,7 +105,7 @@ export default function Board() {
   
   async function fetchNotes(username) {
     const { data: game } = await client.models.Note.list({
-      gameRoom: { eq: username }, // Find game room with matching username 
+      gameRoom: { eq: whitePlayer+blackPlayer }, // Find game room with matching username 
     });
 
     if (game.length > 0) {
