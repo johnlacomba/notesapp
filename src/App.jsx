@@ -71,7 +71,9 @@ export default function Board() {
   const [currentPlayer, setCurrentPlayer] = useState('w'); // 'w' for white, 'b' for black
   const [showModal, setShowModal] = useState(true); // Modal visibility
   const [boardReady, setBoardReady] = useState(false); // Chessboard rendering
-
+  const [whitePlayer, setWhitePlayer] = useState(null); // Store the username of the whitePlayer at game launch
+  const [blackPlayer, setBlackPlayer] = useState(null); // Store the username of the blackPlayer at game launch
+  
   // Function to close the modal and show the chessboard
   const handleCloseModal = () => {
     setShowModal(false);
@@ -114,8 +116,6 @@ export default function Board() {
   }
 
   const updateGameRoomDescription = async () => {
-    var whitePlayer = null;
-    var blackPlayer = null;
     console.log("getUserInfo5: ", username);
     try {
       // Step 1: Query the existing game room by username
@@ -125,21 +125,10 @@ export default function Board() {
       console.log("existingGameRoom: ", existingGameRoom);
       if (existingGameRoom.length > 0) {
         const gameRoom = existingGameRoom[0]; // Get the first matching game room
-        // Determine the username playing each side
-        console.log(currentPlayer);
-        switch(currentPlayer) {
-          case "w":
-            whitePlayer = currentPlayer;
-            break;
-          case "b":
-            blackPlayer = currentPlayer;
-            break;
-        }
-      
         // Step 2: Update the description field with the new FEN state
         const { data: updatedGameRoom } = await client.models.Note.update({
           id: gameRoom.id, // Use the ID of the existing game room
-          gameRoom: username,
+          gameRoom: whitePlayer+blackPlayer,
           description: gameRef.current.fen(), // Update the description
           whitePlayer: whitePlayer,
           blackPlayer: blackPlayer,
@@ -191,6 +180,7 @@ export default function Board() {
   };
 
   const onDrop = (sourceSquare, targetSquare) => {
+    
     const move = gameRef.current.move({
       from: sourceSquare,
       to: targetSquare,
@@ -252,15 +242,27 @@ export default function Board() {
               <div style={overlayStyles} />
               <div style={modalStyles}>
                 <h2>Welcome, {user.signInDetails.loginId}!</h2>
-                <p>Are you ready to start the game?</p>
+                <p>Choose your side.</p>
                 
                 <Button onClick={() => {
                       console.log(user);
+                      setWhitePlayer(user.signInDetails.loginId);
+                      setBlackPlayer("STOCKFISH");
                       handleCloseModal();
                       fetchUser();
                       updateGameState();
                     }}
-                >Let's Play!</Button>
+                >White</Button>
+
+                <Button onClick={() => {
+                      console.log(user);
+                      setBlackPlayer(user.signInDetails.loginId);
+                      setWhitePlayer("STOCKFISH");
+                      handleCloseModal();
+                      fetchUser();
+                      updateGameState();
+                    }}
+                >Black</Button>
               </div>
             </>
           )}
