@@ -114,10 +114,8 @@ export default function Board() {
   }
 
   const updateGameRoomDescription = async () => {
-    console.log("updateGameRoomDescription1");
-    whitePlayer = null;
-    blackPlayer = null;
-    console.log("updateGameRoomDescription2");
+    var whitePlayer = null;
+    var blackPlayer = null;
     console.log("getUserInfo5: ", username);
     try {
       // Step 1: Query the existing game room by username
@@ -128,6 +126,7 @@ export default function Board() {
       if (existingGameRoom.length > 0) {
         const gameRoom = existingGameRoom[0]; // Get the first matching game room
         // Determine the username playing each side
+        console.log(currentPlayer);
         switch(currentPlayer) {
           case "w":
             whitePlayer = currentPlayer;
