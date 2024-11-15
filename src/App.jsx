@@ -261,6 +261,7 @@ export default function Board() {
                       handleCloseModal();
                       fetchUser();
                       updateGameState();
+                      makeStockfishMove();
                     }}
                 >Black</Button>
               </div>
