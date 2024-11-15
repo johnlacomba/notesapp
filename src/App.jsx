@@ -114,8 +114,10 @@ export default function Board() {
   }
 
   const updateGameRoomDescription = async () => {
+    console.log("updateGameRoomDescription1");
     whitePlayer = null;
     blackPlayer = null;
+    console.log("updateGameRoomDescription2");
     console.log("getUserInfo5: ", username);
     try {
       // Step 1: Query the existing game room by username
