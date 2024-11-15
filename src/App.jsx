@@ -250,10 +250,12 @@ export default function Board() {
             <>
               <div style={overlayStyles} />
               <div style={modalStyles}>
-                <h2>Welcome, {user}!</h2>
+                <h2>Welcome, {user.username}!</h2>
                 <p>Are you ready to start the game?</p>
                 
                 <Button onClick={() => {
+                      console.log(user.username);
+                      console.log(user);
                       handleCloseModal();
                       fetchUser();
                       updateGameState();
