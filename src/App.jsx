@@ -299,6 +299,7 @@ export default function Board() {
                     undo
                   </button>
                   <Button onClick={() => {
+                      style={buttonStyle}
                       setTimeout(makeStockfishMove, 500);
                     }}
                 >Stockfish</Button>
