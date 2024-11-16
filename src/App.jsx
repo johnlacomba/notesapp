@@ -191,7 +191,7 @@ export default function Board() {
       setHistory([...history, move.san]);
       updateGameState();
       updateGameRoomDescription();
-      setTimeout(makeStockfishMove, 500); // Delay before Stockfish responds
+      //setTimeout(makeStockfishMove, 500); // Delay before Stockfish responds
     }
   };
 
@@ -261,7 +261,6 @@ export default function Board() {
                       handleCloseModal();
                       fetchUser();
                       updateGameState();
-                      setTimeout(makeStockfishMove, 500);
                     }}
                 >Black</Button>
               </div>
@@ -299,6 +298,10 @@ export default function Board() {
                   <button style={buttonStyle} onClick={handleUndo}>
                     undo
                   </button>
+                  <Button onClick={() => {
+                      setTimeout(makeStockfishMove, 500);
+                    }}
+                >Stockfish</Button>
                 </div>
               </div>
             </View>
